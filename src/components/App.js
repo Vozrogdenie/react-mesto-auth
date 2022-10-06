@@ -12,6 +12,7 @@ import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import { CurrentCardContext } from '../contexts/CurrentCardContext';
 import React from 'react';
 import api from '../utils/API';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 
 function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen]  = useState(false);
@@ -21,6 +22,7 @@ function App() {
   const [selectedCard, setSelectedCard] = useState(null);
   const [currentUser, setCurrentUser] = useState({name:'', about:'', avatar:''})
   const [cards, setCards] = useState([])
+  const [loggedIn, setLoggedIn] = useState(false)
  
   function handleCardClick(card) {
     setSelectedCard(card)
@@ -112,18 +114,30 @@ function App() {
 }, []);
 
   return (
+    <BrowserRouter>
     <div >
       <CurrentUserContext.Provider value={currentUser}>
         <CurrentCardContext.Provider value={cards}>
         <Header />
-        <Main
-          onEditProfile={handleEditProfileClick}
-          onAddPlace={handleAddPlaceClick}
-          onEditAvatar={handleEditAvatarClick}
-          handleCardClick={handleCardClick}
-          onCardLike={handleCardLike}
-          onCardDelete={handleCardDelete}
-        />
+        <Main>
+          <Routes>
+            onEditProfile={handleEditProfileClick}
+            onAddPlace={handleAddPlaceClick}
+            onEditAvatar={handleEditAvatarClick}
+            handleCardClick={handleCardClick}
+            onCardLike={handleCardLike}
+            onCardDelete={handleCardDelete}
+            {/* <Route path="/sign-up">
+              <Register  />
+            </Route>         
+            <Route path="/sign-in">
+              <Login />
+            </Route> */}
+            {/* <Route exact path="/">
+              {this.state.loggedIn ? <Navigate to="/diary" /> : <Navigate to="/sign-in" />}
+            </Route>  */}
+          </Routes>
+        </Main>
         <Footer />
         <PopupEditProfile opened={isEditProfilePopupOpen} onUpdateUser={handleUpdateUser}  onClosePopup={closeAllPopups}></PopupEditProfile> 
         <PopupAddPlace opened={isAddPlacePopupOpen} onPlace={handleAddPlaceSubmit} onClosePopup={closeAllPopups}></PopupAddPlace>
@@ -133,6 +147,7 @@ function App() {
       </CurrentCardContext.Provider>
     </CurrentUserContext.Provider>
     </div>
+    </BrowserRouter>
   );
 };
   
