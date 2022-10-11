@@ -1,5 +1,6 @@
 const api_url = "https://mesto.nomoreparties.co/v1/cohort-48";
 const api_auth = "c7779e8e-b945-41f5-b681-0ea9ccf3c32a";
+const BASA_url = 'https://auth.nomoreparties.co';
 
 class Api {
     constructor(api_url, api_authorization){
@@ -13,6 +14,51 @@ class Api {
         }
         return res.json();
     };
+
+    request = ({
+        url,
+        method = 'POST',
+        token,
+        data
+      }) => {
+        return fetch(`${BASA_url}${url}`, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            ...!!token && { 'Authorization': `Bearer ${token}` }
+          },
+          ...!!data && { body: JSON.stringify(data) }
+        })
+        .then((res) => {
+          if (!res.ok) return Promise.reject(res.status);
+      
+          return res.json();
+        });
+      }
+      
+    register = (email, password) => {
+        return this.request({
+          url: '/signup',
+          data: {email, password}
+        });
+      };
+      
+    authorize = (email, password) => {
+        return this.request({
+          url: '/signin',
+          data: {email, password}
+        });
+      };
+      
+    getContent = (token) => {
+        return this.request({
+          url: '/users/me',
+          method: 'GET',
+          token
+        });
+      }
+      
+
     async getApiCards(){
         return fetch(`${this._url}/cards`, {
             headers: {
