@@ -34,21 +34,31 @@ function App() {
     tokenCheck()
   }, [])
 
-  function handleLogin (username, password)  {
-    return api.authorize(username, password)
+  function handleLogin (password, email)  {
+    return api.authorize(password, email)
     .then((data) => {
       if (!data.jwt) throw Error ('Not jwt');
       localStorage.setItem('jwt', data.jwt);
       setLoggedIn(true);
-      history.push('/my-profile')
+      setUserData({
+        password: data.password,
+        email: data.email
+        
+    });
+      history.push('/')
     })
   }
 
-  function handleRegister (email, password) {
-    return api.register(email, password)
+  function handleRegister (password, email) {
+    return api.register(password, email)
     .then(() => {
-      history.push('/login')
+      history.push('/signin')
     })
+  }
+  const handleLogout = () => {
+    localStorage.removeItem('jwt');
+    setLoggedIn(false);
+    history.push('/login');
   }
 
   function tokenCheck  () {
@@ -57,10 +67,9 @@ function App() {
   api.getContent(jwt).then((data) => {
     setLoggedIn(true);
     setUserData({
-      username: data.username,
-      email: data.email
+      email: data.user.email
     })
-    history.push('/my-profile')
+    history.push('/')
   })
 
   }
@@ -156,7 +165,7 @@ function App() {
   return (
 
     <div>
-        <Header />
+        
         <BrowserRouter>
           <Switch>  
 
@@ -180,9 +189,19 @@ function App() {
     </CurrentUserContext.Provider>           
             </ProtectedRoute>
             <Route  path="/signup">
+            <Header 
+              link={'Войти'}
+              
+              path='/signin'
+              />
               <Register  onRegister={handleRegister}/>
-            </Route>         
+            </Route>     
             <Route  path="/signin">
+            <Header 
+              link={'Зарегистрироваться'}
+              
+              path='/signup'
+              />    
               <Login  onLogin={handleLogin}/>
             </Route> 
             {/* <Route exact path="/">

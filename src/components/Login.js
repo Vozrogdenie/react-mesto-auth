@@ -3,8 +3,8 @@ import {Link, withRouter} from 'react-router-dom';
 
 function Login (props) {
   const [state, setState] = React.useState({
-    username: '',
-    password: ''
+    password:'',
+    email: '',
   })
 
   function  handleChange (e) {
@@ -17,9 +17,9 @@ function Login (props) {
 
    function handleSubmit (e) {
         e.preventDefolt()
-        const {username, password} = state;
-        if (!username || !password) return; 
-        props.onLogin(username, password)
+        const {password, email} = state;
+        if (!password || !email) return; 
+        props.onLogin(password, email)
         .catch(err =>{
           console.log(err)
           setState({
@@ -33,7 +33,7 @@ function Login (props) {
           <div className="login">
             <p className="login__title">Вход</p>
             <form onSubmit={handleSubmit} className="login__form">
-              <input required id="username" name="username" placeholder="Email" className="login__input login__input_value_name" type="text" value={state.username} onChange={handleChange} />
+              <input required id="email" name="email" placeholder="Email" className="login__input login__input_value_name" type="text" value={state.email} onChange={handleChange} />
               <input required id="password" name="password" placeholder="Название" className="login__input login__input_value_password" type="password" value={state.password} onChange={handleChange} />
               <button type="submit" className="login__submit-button">Войти</button>
             </form>

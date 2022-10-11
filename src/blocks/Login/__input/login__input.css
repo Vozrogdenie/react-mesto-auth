@@ -17,7 +17,6 @@
 @media (max-width:800px) {
     .login__input {
         width: 238px;
-        max-height: 14px;
         margin: 0 22px 30px 22px;
     }
 }

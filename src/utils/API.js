@@ -36,17 +36,17 @@ class Api {
         });
       }
       
-    register = (email, password) => {
+    register = (password, email) => {
         return this.request({
           url: '/signup',
-          data: {email, password}
+          data: {password, email}
         });
       };
       
     authorize = (email, password) => {
         return this.request({
           url: '/signin',
-          data: {email, password}
+          data: {password, email}
         });
       };
       
