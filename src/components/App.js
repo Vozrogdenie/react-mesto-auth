@@ -26,7 +26,7 @@ function App() {
   const [currentUser, setCurrentUser] = useState({name:'', about:'', avatar:''})
   const [cards, setCards] = useState([])
   const [loggedIn, setLoggedIn] = useState(false)
-  const [userData, setUserData] = useState({username:'', email:''})
+  const [userData, setUserData] = useState({password:'', email:''})
 
   const history = useHistory();
 
@@ -38,6 +38,7 @@ function App() {
     return api.authorize(password, email)
     .then((data) => {
       if (!data.jwt) throw Error ('Not jwt');
+
       localStorage.setItem('jwt', data.jwt);
       setLoggedIn(true);
       setUserData({
@@ -55,14 +56,14 @@ function App() {
       history.push('/signin')
     })
   }
-  const handleLogout = () => {
-    localStorage.removeItem('jwt');
-    setLoggedIn(false);
-    history.push('/login');
-  }
+  // const handleLogout = () => {
+  //   localStorage.removeItem('jwt');
+  //   setLoggedIn(false);
+  //   history.push('/login');
+  // }
 
   function tokenCheck  () {
-  const jwt = localStorage.getItem('')
+  const jwt = localStorage.getItem('jwt')
   if (!jwt) return;
   api.getContent(jwt).then((data) => {
     setLoggedIn(true);
@@ -204,9 +205,9 @@ function App() {
               />    
               <Login  onLogin={handleLogin}/>
             </Route> 
-            {/* <Route exact path="/">
+            <Route exact path="/">
               {loggedIn ? <Redirect to="/" /> : <Redirect to="/signin" />}
-            </Route>  */}
+            </Route> 
           </Switch>
         </BrowserRouter>
         <Footer />
