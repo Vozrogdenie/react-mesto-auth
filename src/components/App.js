@@ -68,7 +68,9 @@ function App() {
   api.getContent(jwt).then((data) => {
     setLoggedIn(true);
     setUserData({
+      password: data.user.password,
       email: data.user.email
+
     })
     history.push('/')
   })
