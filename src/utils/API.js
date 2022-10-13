@@ -43,7 +43,7 @@ class Api {
         });
       };
       
-    authorize = (email, password) => {
+    authorize = (password, email) => {
         return this.request({
           url: '/signin',
           data: {password, email}

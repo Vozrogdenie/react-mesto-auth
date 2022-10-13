@@ -32,23 +32,34 @@ function App() {
 
   React.useEffect(() => {
     tokenCheck()
-  }, [])
+  }, [history, loggedIn])
 
-  function handleLogin(password, email) {
+  function tokenCheck() {
+    const jwt = localStorage.getItem('jwt')
+    if (!jwt) return;
+    api.getContent(jwt).then((data) => {
+      setLoggedIn(true);
+      setUserData({
+        password: data.data.password,
+        email: data.data.email
+
+      })
+      history.push('/')
+    })
+
+  }
+
+  const handleLogin = (password, email) => {
     return api.authorize(password, email)
       .then((data) => {
-        if (!data.jwt) throw Error('Not jwt');
+        if (!data.token) throw new Error('Missing jwt');
 
-        localStorage.setItem('jwt', data.jwt);
+        localStorage.setItem('jwt', data.token);
         setLoggedIn(true);
-        setUserData({
-          password: data.password,
-          email: data.email
 
-        });
-        history.push('/')
-      })
-  }
+        history.push('/');
+      });
+  };
 
   function handleRegister(password, email) {
     return api.register(password, email)
@@ -62,20 +73,7 @@ function App() {
   //   history.push('/login');
   // }
 
-  function tokenCheck() {
-    const jwt = localStorage.getItem('jwt')
-    if (!jwt) return;
-    api.getContent(jwt).then((data) => {
-      setLoggedIn(true);
-      setUserData({
-        password: data.user.password,
-        email: data.user.email
 
-      })
-      history.push('/')
-    })
-
-  }
   function handleCardClick(card) {
     setSelectedCard(card)
   };
@@ -167,44 +165,50 @@ function App() {
 
   return (
     <div>
-        <Switch>
-          <ProtectedRoute exact path="/" loggedIn={loggedIn} >
-            <CurrentUserContext.Provider value={currentUser}>
-              <CurrentCardContext.Provider value={cards}>
-                <Main
-                  onEditProfile={handleEditProfileClick}
-                  onAddPlace={handleAddPlaceClick}
-                  onEditAvatar={handleEditAvatarClick}
-                  handleCardClick={handleCardClick}
-                  onCardLike={handleCardLike}
-                  onCardDelete={handleCardDelete}
-                />
-                <PopupEditProfile opened={isEditProfilePopupOpen} onUpdateUser={handleUpdateUser} onClosePopup={closeAllPopups}></PopupEditProfile>
-                <PopupAddPlace opened={isAddPlacePopupOpen} onPlace={handleAddPlaceSubmit} onClosePopup={closeAllPopups}></PopupAddPlace>
-                <PopupEditAvatar opened={isEditAvatarPopupOpen} onUpdateAvatar={handleUpdateAvatar} onClosePopup={closeAllPopups}></PopupEditAvatar>
-                <ImagePopup card={selectedCard} onClose={closeAllPopups} />
-                <PopupWithForm name="you-sure" opened={isYouSurePopupOpen} title='Вы уверены?' buttonText='Да' onClosePopup={closeAllPopups}><PopupYouSure /></PopupWithForm>
-              </CurrentCardContext.Provider>
-            </CurrentUserContext.Provider>
-          </ProtectedRoute>
-          <Route path="/signup">
-            <Header
-              link={'Войти'}
-              path='/signin'
-            />
-            <Register onRegister={handleRegister} />
-          </Route>
-          <Route path="/signin">
-            <Header
-              link={'Зарегистрироваться'}
-              path='/signup'
-            />
-            <Login onLogin={handleLogin} />
-          </Route>
-          <Route exact path="/">
-            {loggedIn ? <Redirect to="/" /> : <Redirect to="/signin" />}
-          </Route>
-        </Switch>
+      <Switch>
+        <ProtectedRoute exact path="/" loggedIn={loggedIn} >
+          <Header
+
+            userData={userData}
+          />
+          <CurrentUserContext.Provider value={currentUser}>
+            <CurrentCardContext.Provider value={cards}>
+              <Main
+                onEditProfile={handleEditProfileClick}
+                onAddPlace={handleAddPlaceClick}
+                onEditAvatar={handleEditAvatarClick}
+                handleCardClick={handleCardClick}
+                onCardLike={handleCardLike}
+                onCardDelete={handleCardDelete}
+              />
+              <PopupEditProfile opened={isEditProfilePopupOpen} onUpdateUser={handleUpdateUser} onClosePopup={closeAllPopups}></PopupEditProfile>
+              <PopupAddPlace opened={isAddPlacePopupOpen} onPlace={handleAddPlaceSubmit} onClosePopup={closeAllPopups}></PopupAddPlace>
+              <PopupEditAvatar opened={isEditAvatarPopupOpen} onUpdateAvatar={handleUpdateAvatar} onClosePopup={closeAllPopups}></PopupEditAvatar>
+              <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+              <PopupWithForm name="you-sure" opened={isYouSurePopupOpen} title='Вы уверены?' buttonText='Да' onClosePopup={closeAllPopups}><PopupYouSure /></PopupWithForm>
+            </CurrentCardContext.Provider>
+          </CurrentUserContext.Provider>
+        </ProtectedRoute>
+        <Route path="/signup">
+          <Header
+            link={'Войти'}
+            path='/signin'
+            userData={''}
+          />
+          <Register onRegister={handleRegister} />
+        </Route>
+        <Route path="/signin">
+          <Header
+            link={'Зарегистрироваться'}
+            path='/signup'
+            userData={''}
+          />
+          <Login onLogin={handleLogin} />
+        </Route>
+        <Route exact path="/">
+          {loggedIn ? <Redirect to="/" /> : <Redirect to="/signin" />}
+        </Route>
+      </Switch>
       <Footer />
     </div>
   );
