@@ -12,27 +12,33 @@ import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import { CurrentCardContext } from '../contexts/CurrentCardContext';
 import React from 'react';
 import api from '../utils/API';
-import { BrowserRouter, Switch, Redirect, Route, useHistory } from 'react-router-dom';
+import { Switch, Redirect, Route, useHistory } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import Login from './Login';
 import Register from './Register';
+import InfoTooltip from './InfoTooltip'
+import Unionjackdaw from '../images/Unionjackdaw.png'
+import Unioncross from '../images/Unioncross.png'
+
 
 function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isYouSurePopupOpen, setIsYouSurePopupOpen] = useState(false);
+  const [isInfoTooltip, setIsInfoTooltip] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
   const [currentUser, setCurrentUser] = useState({ name: '', about: '', avatar: '' })
   const [cards, setCards] = useState([])
   const [loggedIn, setLoggedIn] = useState(false)
   const [userData, setUserData] = useState({ password: '', email: '' })
+  const [message, setMessage] = useState({ message: '', img: '' })
 
   const history = useHistory();
 
   React.useEffect(() => {
     tokenCheck()
-  }, [history, loggedIn])
+  }, [])
 
   function tokenCheck() {
     const jwt = localStorage.getItem('jwt')
@@ -42,11 +48,9 @@ function App() {
       setUserData({
         password: data.data.password,
         email: data.data.email
-
       })
       history.push('/')
     })
-
   }
 
   const handleLogin = (password, email) => {
@@ -64,15 +68,20 @@ function App() {
   function handleRegister(password, email) {
     return api.register(password, email)
       .then(() => {
-        history.push('/signin')
-      })
-  }
-  // const handleLogout = () => {
-  //   localStorage.removeItem('jwt');
-  //   setLoggedIn(false);
-  //   history.push('/login');
-  // }
 
+        setMessage({ message: 'Вы успешно зарегистрировались!', img: Unionjackdaw })
+        history.push('/signin')
+      }).catch(err => {
+        console.log(err)
+        setMessage({ message: ('Что-то пошло не так!   Попробуйте еще раз.'), img: Unioncross })
+      }).finally(() => setIsInfoTooltip(true));
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('jwt');
+    setLoggedIn(false);
+    history.push('/signin');
+  }
 
   function handleCardClick(card) {
     setSelectedCard(card)
@@ -95,6 +104,7 @@ function App() {
     setIsEditAvatarPopupOpen(false)
     setIsEditProfilePopupOpen(false)
     setIsAddPlacePopupOpen(false)
+    setIsInfoTooltip(false);
   };
 
   React.useEffect(() => {
@@ -168,7 +178,9 @@ function App() {
       <Switch>
         <ProtectedRoute exact path="/" loggedIn={loggedIn} >
           <Header
-
+            link={'Выйти'}
+            path='/signin'
+            onLogout={handleLogout}
             userData={userData}
           />
           <CurrentUserContext.Provider value={currentUser}>
@@ -196,6 +208,7 @@ function App() {
             userData={''}
           />
           <Register onRegister={handleRegister} />
+          <InfoTooltip opened={isInfoTooltip} onClose={closeAllPopups} onTitle={message} />
         </Route>
         <Route path="/signin">
           <Header

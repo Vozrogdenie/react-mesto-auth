@@ -11,7 +11,6 @@
 @import url(./blocks/content/content.css);
 
 @import url(./blocks/Login/login.css);
-@import url(./blocks/Login/__button-container/login__button-container.css);
 @import url(./blocks/Login/__form/login__form.css);
 @import url(./blocks/Login/__input/login__input.css);
 @import url(./blocks/Login/__submit-button/login__submit-button.css);
@@ -42,6 +41,9 @@
 @import url(./blocks/popup/__container/popup__container.css);
 @import url(./blocks/popup/_opened/popup_opened.css);
 @import url(./blocks/popup/__input/_type/popup__input_type_error.css);
+
+@import url(./blocks/infoTooltip/__image/popup__image.css);
+@import url(./blocks/infoTooltip/__title-infoTooltip/popup__title-infoTooltip.css);
 
 @import url(./blocks/elements/elements.css);
 @import url(./blocks/element/__heart/element__heart.css);
