@@ -1,12 +1,15 @@
 import PopupWithForm from "./PopupWithForm";
-import { CurrentCardContext } from "../contexts/CurrentCardContext";
 import React from "react";
 
 function PopupAddPlace(props) {
     const [name, setName] = React.useState('');
     const [link, setLink] = React.useState('');
-    const cards = React.useContext(CurrentCardContext);
 
+    React.useEffect(() => {
+        setName('');
+        setLink('');
+    }, [props.opened]);
+ 
     function handleSubmit(e) {
         e.preventDefault();
         props.onPlace({

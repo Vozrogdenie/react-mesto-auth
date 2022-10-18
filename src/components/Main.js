@@ -33,9 +33,9 @@ function Main(props) {
                 </div>
             </section>
             <section className="elements">
-                {cards && cards.map(card => <Card key={card._id} card={card} handleCardClick={props.handleCardClick} onCardDelete={props.onCardDelete} onCardLike={props.onCardLike}
+                {cards && cards.map(card => (<Card key={card._id} card={card} handleCardClick={props.handleCardClick} onCardDelete={props.onCardDelete} onCardLike={props.onCardLike}
                     isOwn={card.owner._id === currentUser._id}
-                    isLiked={card.likes.some(i => i._id === currentUser._id)} />)}
+                    isLiked={card.likes.some(i => i._id === currentUser._id)} />))}
             </section>
         </main>
     );

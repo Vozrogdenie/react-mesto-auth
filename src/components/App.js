@@ -17,8 +17,9 @@ import ProtectedRoute from './ProtectedRoute';
 import Login from './Login';
 import Register from './Register';
 import InfoTooltip from './InfoTooltip'
-import Unionjackdaw from '../images/Unionjackdaw.png'
-import Unioncross from '../images/Unioncross.png'
+import unionJackdaw from '../images/unionJackdaw.png'
+import unionCross from '../images/unionCross.png'
+import auth from '../utils/auth';
 
 
 function App() {
@@ -33,8 +34,25 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false)
   const [userData, setUserData] = useState({ password: '', email: '' })
   const [message, setMessage] = useState({ message: '', img: '' })
+  const [isLoading, setIsLoading] = useState(false)
 
+  const isOpen = isEditProfilePopupOpen || isEditProfilePopupOpen || isAddPlacePopupOpen || isYouSurePopupOpen || isInfoTooltip;
   const history = useHistory();
+  const buttonText=(isLoading ? "Сохранение..." : "Сохранить")
+ 
+  React.useEffect(() => {
+    function closeByEscape (evt) {
+      if (evt.key === 'Escape'){
+        closeAllPopups();
+      }
+    }
+    if (isOpen) {
+      document.addEventListener('keydown', closeByEscape);
+      return () => {
+        document.removeEventListener('keydown', closeByEscape)
+      }
+    }
+  }, [isOpen])
 
   React.useEffect(() => {
     tokenCheck()
@@ -43,18 +61,19 @@ function App() {
   function tokenCheck() {
     const jwt = localStorage.getItem('jwt')
     if (!jwt) return;
-    api.getContent(jwt).then((data) => {
+    auth.checkToken(jwt).then((data) => {
       setLoggedIn(true);
       setUserData({
-        password: data.data.password,
         email: data.data.email
       })
       history.push('/')
-    })
+    }).catch((err) => {
+      console.log(err)
+    });
   }
 
   const handleLogin = (password, email) => {
-    return api.authorize(password, email)
+    return auth.authorize(password, email)
       .then((data) => {
         if (!data.token) throw new Error('Missing jwt');
 
@@ -66,14 +85,14 @@ function App() {
   };
 
   function handleRegister(password, email) {
-    return api.register(password, email)
+    return auth.register(password, email)
       .then(() => {
 
-        setMessage({ message: 'Вы успешно зарегистрировались!', img: Unionjackdaw })
+        setMessage({ message: 'Вы успешно зарегистрировались!', img: unionJackdaw })
         history.push('/signin')
       }).catch(err => {
         console.log(err)
-        setMessage({ message: ('Что-то пошло не так!   Попробуйте еще раз.'), img: Unioncross })
+        setMessage({ message: ('Что-то пошло не так!   Попробуйте еще раз.'), img: unionCross })
       }).finally(() => setIsInfoTooltip(true));
   }
 
@@ -128,30 +147,23 @@ function App() {
   function handleCardDelete(card) {
     api.deleteCard(card._id)
       .then(() => {
-        setCards(cards.filter(c => c._id !== card._id))
+        setCards((state) => state.filter((item) => item._id !== card._id)); 
       }).catch((err) => {
         console.log(err)
       });
   };
 
-  function handleUpdateAvatar(avatar) {
-    api.changeAvatar(avatar)
-      .then((res) => {
-        setCurrentUser(res)
-        closeAllPopups();
-      }).catch((err) => {
-        console.log(err)
-      });
-  };
+
 
   function handleUpdateUser(name, about) {
+    setIsLoading(true)
     api.setApiUsers(name, about)
       .then(res => {
         setCurrentUser(res);
         closeAllPopups();
       }).catch((err) => {
         console.log(err)
-      });
+      }).finally(() => setIsLoading(false));;
   };
 
   function handleAddPlaceSubmit(card) {
@@ -161,8 +173,20 @@ function App() {
         closeAllPopups();
       }).catch((err) => {
         console.log(err)
-      });
+      })
   };
+
+  function handleUpdateAvatar(avatar) {
+    setIsLoading(true)
+    api.changeAvatar(avatar)
+      .then((res) => {
+        setCurrentUser(res)
+        closeAllPopups();
+      }).catch((err) => {
+        console.log(err)
+      }).finally(() => setIsLoading(false));
+  };
+
 
   React.useEffect(() => {
     api.getApiUsers()
@@ -193,9 +217,9 @@ function App() {
                 onCardLike={handleCardLike}
                 onCardDelete={handleCardDelete}
               />
-              <PopupEditProfile opened={isEditProfilePopupOpen} onUpdateUser={handleUpdateUser} onClosePopup={closeAllPopups}></PopupEditProfile>
-              <PopupAddPlace opened={isAddPlacePopupOpen} onPlace={handleAddPlaceSubmit} onClosePopup={closeAllPopups}></PopupAddPlace>
-              <PopupEditAvatar opened={isEditAvatarPopupOpen} onUpdateAvatar={handleUpdateAvatar} onClosePopup={closeAllPopups}></PopupEditAvatar>
+              <PopupEditProfile opened={isEditProfilePopupOpen} buttonText={buttonText} onUpdateUser={handleUpdateUser} onClosePopup={closeAllPopups}></PopupEditProfile>
+              <PopupAddPlace opened={isAddPlacePopupOpen} buttonText={buttonText} onPlace={handleAddPlaceSubmit} onClosePopup={closeAllPopups}></PopupAddPlace>
+              <PopupEditAvatar opened={isEditAvatarPopupOpen} buttonText={buttonText} onUpdateAvatar={handleUpdateAvatar} onClosePopup={closeAllPopups}></PopupEditAvatar>
               <ImagePopup card={selectedCard} onClose={closeAllPopups} />
               <PopupWithForm name="you-sure" opened={isYouSurePopupOpen} title='Вы уверены?' buttonText='Да' onClosePopup={closeAllPopups}><PopupYouSure /></PopupWithForm>
             </CurrentCardContext.Provider>

@@ -1,7 +1,11 @@
 import heart from '../images/Vectorheartnew.svg'
 import trach from '../images/Trashtrach.svg'
+import React from 'react';
+import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
 function Card(props) {
+    const currentUser = React.useContext(CurrentUserContext); 
+    const isOwn = props.card.owner._id === currentUser._id
     const onCardClick = () => {
         props.handleCardClick(props.card)
     }
@@ -16,7 +20,7 @@ function Card(props) {
 
     return (
         <div className="element">
-            {props.isOwn ?
+            {isOwn ?
                 <button className="button" type="button" onClick={onCardDelete} aria-label="Удалить карточку" >
                     <img className="element__trach" src={trach} alt="Удалить" />
                 </button>
