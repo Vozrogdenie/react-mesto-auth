@@ -32,7 +32,7 @@ function App() {
   const [currentUser, setCurrentUser] = useState({ name: '', about: '', avatar: '' })
   const [cards, setCards] = useState([])
   const [loggedIn, setLoggedIn] = useState(false)
-  const [userData, setUserData] = useState({ password: '', email: '' })
+  const [userData, setUserData] = useState({password: '', email: '' })
   const [message, setMessage] = useState({ message: '', img: '' })
   const [isLoading, setIsLoading] = useState(false)
 
@@ -206,6 +206,8 @@ function App() {
             path='/signin'
             onLogout={handleLogout}
             userData={userData}
+            loggedIn={loggedIn}
+            
           />
           <CurrentUserContext.Provider value={currentUser}>
             <CurrentCardContext.Provider value={cards}>
@@ -229,7 +231,7 @@ function App() {
           <Header
             link={'Войти'}
             path='/signin'
-            userData={''}
+            
           />
           <Register onRegister={handleRegister} />
           <InfoTooltip opened={isInfoTooltip} onClose={closeAllPopups} onTitle={message} />
@@ -238,7 +240,7 @@ function App() {
           <Header
             link={'Зарегистрироваться'}
             path='/signup'
-            userData={''}
+            
           />
           <Login onLogin={handleLogin} />
         </Route>

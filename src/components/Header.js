@@ -7,7 +7,10 @@ function Header(props) {
     return (
         <header className="header">
             <img className="header__logo" src={headLogo} alt="Логотип" />
-            <Link to={props.path} type='button' className="header__link" onClick={props.onLogout}> {props.link}</Link>
+            <div className='header__block'>
+                {props.loggedIn && <div className='header__title'>{props.userData.email}</div>}
+                <Link to={props.path} type='button' className="header__link" onClick={props.onLogout}> {props.link}</Link>
+            </div>
         </header>
     );
 }
