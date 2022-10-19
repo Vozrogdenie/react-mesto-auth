@@ -76,7 +76,7 @@ function App() {
     return auth.authorize(password, email)
       .then((data) => {
         if (!data.token) throw new Error('Missing jwt');
-
+        setUserData({ email });
         localStorage.setItem('jwt', data.token);
         setLoggedIn(true);
 
